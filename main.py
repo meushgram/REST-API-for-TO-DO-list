@@ -1,5 +1,5 @@
 from flask import Flask, request
-from flask_restful import Api,Resource
+from flask_restful import Api,Resource,reqparse
 import sqlite3
 app = Flask(__name__)
 api = Api(app)
@@ -9,6 +9,9 @@ def dbConnect():
     cursor = connection.cursor()
     return cursor,connection
 
+parser = reqparse.RequestParser()
+parser.add_argument('date', help='The date parameter is not provided', required=True)
+parser.add_argument('name', help='need the name', required=True)
 class UserAPI(Resource):
     def get(self):
         cursor,connection = dbConnect()
@@ -17,7 +20,9 @@ class UserAPI(Resource):
             x.append(row)
         return {"output":x}
     def post(self):
-        data = request.json
+        data = parser.parse_args()
+        print(data)
+        print(type(data))
         date = data['date']
         name = data['name']
         cursor,connection = dbConnect()
