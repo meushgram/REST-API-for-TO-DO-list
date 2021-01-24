@@ -21,8 +21,6 @@ class UserAPI(Resource):
         return {"output":x}
     def post(self):
         data = parser.parse_args()
-        print(data)
-        print(type(data))
         date = data['date']
         name = data['name']
         cursor,connection = dbConnect()
@@ -34,9 +32,25 @@ class UserAPI(Resource):
         return {'message':'succesful'} , 200
 
     def put(self):
-        return {"Message":"Update succesful"}
+        cursor, connection = dbConnect()
+        data = request.get_json()
+        old = data['old']
+        new = data['new']
+        query = f"UPDATE toDoList SET toDO=? WHERE toDo=?"
+        print(old,new,query)
+        cursor.execute(query, (new,old))
+        connection.commit()
+        connection.close()
+        return {'message': f"delete {new}updated"}, 200
     def delete(self):
-        return {"message":"delete succesful"}
+        cursor, connection = dbConnect()
+        date = request.get_json()
+        date = date['name']
+        query = "DELETE FROM toDoList WHERE  toDo=?"
+        cursor.execute(query,(date,))
+        connection.commit()
+        connection.close()
+        return {'message':f"delete {date}successful"},200
 
 api.add_resource(UserAPI,'/todo')
 
